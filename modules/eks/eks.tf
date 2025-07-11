@@ -22,20 +22,6 @@ resource "aws_iam_role_policy_attachment" "eks_cluster_policy" {
   role       = aws_iam_role.eks_cluster.name
 }
 
-# Create EKS cluster
-resource "aws_eks_cluster" "this" {
-  name     = var.cluster_name
-  role_arn = aws_iam_role.eks_cluster.arn
-
-  vpc_config {
-    subnet_ids = var.subnet_ids
-  }
-
-  depends_on = [
-    aws_iam_role_policy_attachment.eks_cluster_policy
-  ]
-}
-
 # Create IAM role for worker nodes
 resource "aws_iam_role" "eks_node_group" {
   name = "${var.cluster_name}-node-group-role"
@@ -70,7 +56,22 @@ resource "aws_iam_role_policy_attachment" "worker_node_AmazonEKS_CNI_Policy" {
   role       = aws_iam_role.eks_node_group.name
 }
 
-# Create EKS Node Group
+# EKS Cluster
+resource "aws_eks_cluster" "this" {
+  name     = var.cluster_name
+  role_arn = aws_iam_role.eks_cluster.arn
+  version  = "1.32"
+
+  vpc_config {
+    subnet_ids = var.subnet_ids
+  }
+
+  depends_on = [
+    aws_iam_role_policy_attachment.eks_cluster_policy
+  ]
+}
+
+# EKS Node Group
 resource "aws_eks_node_group" "this" {
   cluster_name    = aws_eks_cluster.this.name
   node_group_name = "${var.cluster_name}-ng"
@@ -83,8 +84,8 @@ resource "aws_eks_node_group" "this" {
     min_size     = 1
   }
 
-  ami_type       = "AL2_x86_64EBS"  
-  instance_types = ["t3.medium"]
+  ami_type       = "AL2_x86_64"
+  instance_types = ["t3.micro"]
 
   depends_on = [
     aws_iam_role_policy_attachment.worker_node_AmazonEKSWorkerNodePolicy,
