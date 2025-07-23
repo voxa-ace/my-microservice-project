@@ -1,0 +1,26 @@
+controller:
+  adminUser: admin
+  adminPassword: admin
+  installPlugins:
+    - kubernetes
+    - workflow-aggregator
+    - git
+    - configuration-as-code
+    - docker-workflow
+  JCasC:
+    defaultConfig: false
+
+  persistence:
+    enabled: false
+    storageClass: "-"
+    annotations: {}
+    accessMode: "ReadWriteOnce"
+    size: "4Gi"
+
+agent:
+  enabled: true
+  podTemplates:
+    default:
+      containers:
+        - name: jnlp
+          image: jenkins/inbound-agent:alpine
