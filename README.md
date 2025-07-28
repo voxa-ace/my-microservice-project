@@ -94,8 +94,8 @@ kubectl port-forward svc/argocd-server 8081:443 -n argocd
 kubectl port-forward svc/grafana 3000:80 -n monitoring
 ```
 
-🔗 Відкрийте: [http://localhost:3000](http://localhost:3000)
-🧠 Логін/пароль: admin / admin (або виведіть через Helm output)
+ Відкрийте: [http://localhost:3000](http://localhost:3000)
+ Логін/пароль: admin / admin (або виведіть через Helm output)
 
 ---
 
