@@ -1,82 +1,65 @@
-# Terraform AWS Infrastructure – Homework 5
-
-## 📁 Project Structure
-
-```
-lesson-5/
-│
-├── main.tf               # Main Terraform file with module calls
-├── backend.tf            # Backend configuration (S3 + DynamoDB)
-├── outputs.tf            # Root-level outputs
-│
-├── modules/
-│   ├── s3-backend/       # Module for state storage
-│   ├── vpc/              # VPC networking module
-│   └── ecr/              # ECR repository module
-│
-└── README.md             # Project documentation
-```
-
----
-
-## 📦 Module Descriptions
-
-### 🔹 `s3-backend/`
-- Creates an S3 bucket with versioning enabled for storing Terraform state.
-- Creates a DynamoDB table to enable state locking and prevent conflicts.
-
-### 🔹 `vpc/`
-- Creates a VPC with 3 public and 3 private subnets.
-- Includes an Internet Gateway for public subnets.
-- Adds a NAT Gateway and route tables for private subnets.
-
-### 🔹 `ecr/`
-- Creates an Elastic Container Registry (ECR) repository.
-- Enables image scanning on push.
-- Sets basic repository policies.
-
----
-
-##  Deployment Instructions
-
-###  Initialize Terraform
-
+# Steps
+!!! Make sure you have installed `Terraform` and `Helm` on your system.
+## Terraform
+Ініціалізація Terraform:
 ```bash
 terraform init
 ```
-
-###  Preview Changes
-
+Перевірка змін:
 ```bash
 terraform plan
 ```
-
-###  Apply Infrastructure
-
+Застосування змін:
 ```bash
 terraform apply
 ```
-
-###  Destroy Infrastructure
-
+Завантажити django image на новостворений ECR-репозиторій:
+```bash
+docker tag django_image:latest $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY:latest
+docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPOSITORY:latest
+```
+where `django_image:latest` your django image name that already exists in your local machine.
+Replace $AWS_ACCOUNT_ID, $AWS_REGION, and $ECR_REPOSITORY with your own values.
+## Helm
+Застосування Helm:
+```bash
+cd charts/django-app
+helm install my-django .
+```
+where `my-django` is your helm chart name.
+# Видалення ресурсів:
+Kubernetes (PODs, Services, Deployments etc.)
+```bash
+helm uninstall my-django
+```
+where `my-django` is your helm chart name.
+Terraform (EKS, VPC, ECR etc.)
 ```bash
 terraform destroy
 ```
-
----
-
-## ⚠️ Notes
-
-- After running `terraform destroy`, the S3 bucket and DynamoDB table used for the Terraform backend will also be deleted.  
-  To deploy again, you'll need to recreate them manually or through `terraform apply` using the backend module.
-
-- To avoid unexpected AWS charges, remember to destroy all resources once the assignment is reviewed.
-
-- All module inputs and outputs are configured in the respective `variables.tf` and `outputs.tf` files.
-
----
-
-##  Author
-
-**Volodymyr Kashnikov**  
-Terraform AWS Modules
+# Додаткова інформація:
+Якщо ви хочете оновити helm chart:
+```bash
+helm upgrade my-django .
+```
+Якщо ви хочете оновити terraform:
+```bash
+terraform init -upgrade
+terraform plan
+terraform apply
+```
+# Опис модулів terraform
+## s3-backend
+Модуль для створення S3-бакета для збереження стейтів.
+В модулі створюється S3-бакет, налаштовується версіонування та контроль власності.
+Також створюється DynamoDB-таблиця для блокування стейтів.
+## vpc
+Модуль для створення VPC.
+В модулі встановлена VPC, публічні підмережі, приватні підмережі та зони доступності.
+Також створюється NAT Gateway, Internet Gateway та таблиці роутів для доступу до інтернету.
+## ecr
+Модуль для створення ECR-репозиторію.
+В модулі створюється репозиторій ECR, налаштовується автоматичне сканування security-вразливостей під час push.
+## eks
+Модуль для створення EKS-кластера.
+В модулі створюється EKS-кластер, налаштовується автоматичне сканування security-вразливостей під час push.
