@@ -1,12 +1,3 @@
-<<<<<<< HEAD
-provider "kubernetes" {
-  config_path = "~/.kube/config"
-}
-
-provider "helm" {
-  kubernetes = {
-    config_path = "~/.kube/config"
-=======
 terraform {
   required_providers {
     aws = {
@@ -21,6 +12,5 @@ terraform {
       source  = "hashicorp/kubernetes"
       version = ">= 2.0.0"
     }
->>>>>>> eb91a6e (Add full code for lesson-8-9)
   }
 }
